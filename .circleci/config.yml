@@ -43,8 +43,9 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            # Your code here
-            exit 1
+            npm i
+            npm run build
+            npm start
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -59,31 +60,54 @@ jobs:
       - run:
           name: Back-end build
           command: |
-             # Your code here
-             exit 1
+            npm i
+            npm run build
+            npm start
+
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
 
   test-frontend:
     docker:
-      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      - checkout
+      - restore_cache:
+          keys: [test-frontend-build]
+      - run:
+          name: Test-Frontend 
+          command: |
+            npm i
+            npm run build
+            npm start
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: test-frontend-build
+      
+
                 
   test-backend:
     docker:
-      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      - checkout
+      - restore_cache:
+          keys: [test-backend-build]
+      - run:
+          name: Back-end build
+          command: |
+            npm i
+            npm run build
+            npm start
+
+      - save_cache:
+          paths: [backend/node_modules]
+          key: test-backend-build
             
   scan-frontend:
     docker:
-      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Restore from cache
@@ -91,7 +115,7 @@ jobs:
 
   scan-backend:
     docker:
-      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Restore from cache
@@ -99,9 +123,10 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      # Docker image here that supports AWS CLI
+      - image: cimg/aws:2022.09
     steps:
-      # Checkout code from git
+      - checkout
+      - run: aws --version
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -110,7 +135,6 @@ jobs:
               #--tags project=your-tag \
               # --stack-name "your back-end stack name with workflow id" \
               # --parameter-overrides ID="your workflow id"  
-              exit 1
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -119,12 +143,10 @@ jobs:
               #--tags project=your-tag \
               # --stack-name "your front-end stack name with workflow id" \
               # --parameter-overrides ID="your workflow id"  
-              exit 1
       - run:
           name: Add back-end ip to ansible inventory
           command: |
             # Your code here
-            exit 1
       - persist_to_workspace:
           root: ~/
           paths:
@@ -142,12 +164,10 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
-            exit 1
       - run:
           name: Configure server
           command: |
             # Your code here
-            exit 1
       # Here's where you will add some code to rollback on failure      
 
   run-migrations:
@@ -159,12 +179,10 @@ jobs:
           name: Run migrations
           command: |
             # Your code here
-            exit 1
       - run:
           name: Send migration results to memstash
           command: |
             # Your code here
-            exit 1
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
